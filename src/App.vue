@@ -89,7 +89,7 @@ let editor: any = null
 const pluginReady = ref(false)
 
 // === 按你的环境修改 ===
-const DOCUMENT_SERVER = 'http://192.168.1.103:9998'
+const DOCUMENT_SERVER = 'http://localhost:9998'
 //const DOCUMENT_SERVER = 'http://222.187.11.98:8918'
 //const DOCUMENT_SERVER = 'http://localhost:9998'
 const DOCS_API = DOCUMENT_SERVER + '/web-apps/apps/api/documents/api.js'
@@ -254,6 +254,16 @@ async function createEditor() {
         if (e.data.command === 'bindingClicked') {
           console.log('[ONLYOFFICE] 绑定控件被点击:', e.data.data)
           handleBindingClicked(e.data.data)
+        }
+        // 通用元素检测事件 - 新增
+        if (e.data.command === 'elementClicked') {
+          console.log('[ONLYOFFICE] 元素被点击:', e.data.data)
+          handleElementClicked(e.data.data)
+        }
+        // 精确表格单元格检测事件 - 新增
+        if (e.data.command === 'preciseTableCellClicked') {
+          console.log('[ONLYOFFICE] 精确表格单元格被点击:', e.data.data)
+          handlePreciseTableCellClicked(e.data.data)
         }
       }
     }
@@ -513,15 +523,15 @@ function handleLinkClick(data: any) {
     // 显示详细的控件信息和数据
     const info = `链接控件被点击！
 
-控件ID: ${data.controlId || 'unknown'}
-控件标题: ${data.controlTitle || '无标题'}
-控件Tag: ${data.tag || '无Tag'}
+      控件ID: ${data.controlId || 'unknown'}
+      控件标题: ${data.controlTitle || '无标题'}
+      控件Tag: ${data.tag || '无Tag'}
 
-绑定数据:
-${JSON.stringify(data.data, null, 2)}
+      绑定数据:
+      ${JSON.stringify(data.data, null, 2)}
 
-完整信息:
-${JSON.stringify(data, null, 2)}`;
+      完整信息:
+      ${JSON.stringify(data, null, 2)}`;
 
     alert(info);
 
@@ -541,10 +551,10 @@ function handleWordArtInserted(data: any) {
     // 显示成功信息
     const info = `WordArt 插入成功！
 
-文本: ${data.parameters?.text || '未知'}
-字体大小: ${data.parameters?.fontSize || '未知'}
-字体: ${data.parameters?.fontFamily || '未知'}
-变换效果: ${data.parameters?.transform || '未知'}
+      文本: ${data.parameters?.text || '未知'}
+      字体大小: ${data.parameters?.fontSize || '未知'}
+      字体: ${data.parameters?.fontFamily || '未知'}
+      变换效果: ${data.parameters?.transform || '未知'}
 
 ${data.message || ''}`;
 
@@ -563,14 +573,14 @@ function handleWordArtError(data: any) {
   const errorMsg = data?.error || '未知错误'
   const info = `WordArt 插入失败！
 
-错误信息: ${errorMsg}
+      错误信息: ${errorMsg}
 
-可能的原因:
-- 当前位置不支持插入WordArt
-- API参数错误
-- OnlyOffice版本不支持WordArt功能
+      可能的原因:
+      - 当前位置不支持插入WordArt
+      - API参数错误
+      - OnlyOffice版本不支持WordArt功能
 
-请检查控制台获取详细错误信息。`;
+      请检查控制台获取详细错误信息。`;
 
   alert(info);
 }
@@ -701,7 +711,115 @@ function handleSelectionBound(data: any) {
   }
 }
 
-// 处理绑定控件点击事件
+// 处理通用元素检测事件 - 新增
+function handleElementClicked(data: any) {
+  console.log('🎯 处理通用元素点击事件，收到数据:', data)
+
+  if (data && data.success && data.data) {
+    const elementInfo = data.data;
+
+    let info = `🎯 元素点击检测结果！\n\n`;
+    info += `点击类型: ${elementInfo.clickType}\n`;
+    info += `检测时间: ${elementInfo.timestamp}\n\n`;
+
+    // 根据不同元素类型显示详细信息
+    if (elementInfo.clickType === 'table') {
+      info += `📊 表格信息:\n`;
+      info += `- 表格索引: ${elementInfo.elementInfo.tableIndex}\n`;
+      info += `- 总行数: ${elementInfo.elementInfo.totalRows}\n`;
+      info += `- 总列数: ${elementInfo.elementInfo.totalColumns}\n`;
+
+      if (elementInfo.elementInfo.clickedCell) {
+        info += `- 点击位置: 第${elementInfo.elementInfo.clickedCell.row}行第${elementInfo.elementInfo.clickedCell.column}列\n`;
+        info += `- 单元格内容: "${elementInfo.elementInfo.clickedCellInfo?.content || '空'}"\n`;
+      }
+
+      if (elementInfo.elementInfo.sampleContent && elementInfo.elementInfo.sampleContent.length > 0) {
+        info += `\n📋 表格内容预览:\n`;
+        elementInfo.elementInfo.sampleContent.slice(0, 2).forEach((row: any[], index: number) => {
+          info += `第${index + 1}行: [${row.slice(0, 3).join(', ')}${row.length > 3 ? '...' : ''}]\n`;
+        });
+      }
+
+    } else if (elementInfo.clickType === 'paragraph') {
+      info += `📝 段落信息:\n`;
+      info += `- 段落索引: ${elementInfo.elementInfo.paragraphIndex}\n`;
+      info += `- 对齐方式: ${elementInfo.elementInfo.alignment}\n`;
+      info += `- 文本长度: ${elementInfo.elementInfo.metadata?.fullTextLength || 0}字符\n`;
+      info += `- 文本预览: "${elementInfo.elementInfo.text}"\n`;
+
+    } else if (elementInfo.clickType === 'shape') {
+      info += `🔷 图形信息:\n`;
+      info += `- 图形索引: ${elementInfo.elementInfo.shapeIndex}\n`;
+      info += `- 图形类型: ${elementInfo.elementInfo.shapeType}\n`;
+      info += `- 包含内容: ${elementInfo.elementInfo.hasContent ? '是' : '否'}\n`;
+
+    } else if (elementInfo.clickType === 'document') {
+      info += `📄 文档区域:\n`;
+      info += `- 有选区: ${elementInfo.elementInfo.hasSelection ? '是' : '否'}\n`;
+      info += `- 扫描元素: ${elementInfo.elementInfo.metadata?.totalElementsScanned || 0}个\n`;
+    }
+
+    // 显示扫描统计
+    if (elementInfo.fullScanResults) {
+      info += `\n🔍 文档扫描统计:\n`;
+      info += `- 表格: ${elementInfo.fullScanResults.tablesFound}个\n`;
+      info += `- 段落: ${elementInfo.fullScanResults.paragraphsFound}个\n`;
+      info += `- 图形: ${elementInfo.fullScanResults.shapesFound}个\n`;
+    }
+
+    alert(info);
+
+    // 可以根据元素类型执行不同的操作
+    console.log('🎯 元素类型:', elementInfo.clickType, '详细信息:', elementInfo.elementInfo);
+
+  } else {
+    console.log('❌ 通用元素检测失败:', data?.error || '未知错误');
+    // 不显示失败的alert，避免过多弹窗
+  }
+}
+
+// 处理精确表格单元格检测事件 - 新增
+function handlePreciseTableCellClicked(data: any) {
+  console.log('📊 处理精确表格单元格点击事件，收到数据:', data)
+
+  if (data && data.success && data.data) {
+    const cellInfo = data.data;
+
+    let info = `📊 精确表格单元格点击！\n\n`;
+    info += `🎯 单元格位置:\n`;
+    info += `- 行: 第${cellInfo.cellPosition.row}行\n`;
+    info += `- 列: 第${cellInfo.cellPosition.column}列\n`;
+    info += `- 单元格内容: "${cellInfo.cellContent}"\n\n`;
+
+    info += `📋 表格信息:\n`;
+    info += `- 总行数: ${cellInfo.tableInfo.totalRows}\n`;
+    info += `- 总列数: ${cellInfo.tableInfo.totalColumns}\n`;
+    info += `- 检测方法: ${cellInfo.detectionMethod}\n`;
+    info += `- 检测时间: ${cellInfo.timestamp}\n`;
+
+    alert(info);
+
+    // 可以根据精确位置执行特定操作
+    console.log('📊 精确单元格信息:', {
+      row: cellInfo.cellPosition.row,
+      column: cellInfo.cellPosition.column,
+      content: cellInfo.cellContent,
+      tableInfo: cellInfo.tableInfo
+    });
+
+    // 示例：根据点击的单元格执行不同操作
+    if (cellInfo.cellPosition.row === 1) {
+      console.log('🎯 点击了表头行，可以执行排序等操作');
+    } else {
+      console.log('🎯 点击了数据行，可以执行编辑等操作');
+    }
+
+  } else {
+    console.log('❌ 精确表格单元格检测失败:', data?.error || '未知错误');
+    // 这通常是因为不是表格区域或检测方法失败，不需要alert
+  }
+}
 function handleBindingClicked(data: any) {
   console.log('处理绑定控件点击事件，收到数据:', data)
 
