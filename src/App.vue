@@ -514,7 +514,7 @@ function testChartDetection() {
 function generateSampleChartData() {
   return {
     data: {
-      title: '销售趋势图',
+      title: '销售趋势图11111222',
       type: 'line-chart',
       dataSource: 'ERP系统',
       category: '销售分析',
