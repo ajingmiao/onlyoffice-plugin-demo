@@ -24,20 +24,7 @@
       </div>
 
       <!-- Shape 测试按钮 -->
-      <div style="display:flex;gap:4px;border-left:1px solid #ddd;padding-left:8px;">
-        <button @click="testShapeInline" style="background:#795548;color:#fff;border:none;padding:6px 8px;border-radius:4px;font-size:12px;">
-          测试Shape
-        </button>
-        <button @click="insertRectangleInline" style="background:#607d8b;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
-          矩形
-        </button>
-        <button @click="insertCircleInline" style="background:#455a64;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
-          圆形
-        </button>
-        <button @click="insertTriangleInline" style="background:#37474f;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
-          三角形
-        </button>
-      </div>
+     
 
       <!-- Table 按钮组 -->
       <div style="display:flex;gap:4px;border-left:1px solid #ddd;padding-left:8px;">
@@ -102,7 +89,7 @@ let editor: any = null
 const pluginReady = ref(false)
 
 // === 按你的环境修改 ===
-const DOCUMENT_SERVER = 'http://localhost:9998'
+const DOCUMENT_SERVER = 'http://192.168.1.103:9998'
 //const DOCUMENT_SERVER = 'http://222.187.11.98:8918'
 //const DOCUMENT_SERVER = 'http://localhost:9998'
 const DOCS_API = DOCUMENT_SERVER + '/web-apps/apps/api/documents/api.js'
@@ -514,7 +501,7 @@ function testChartDetection() {
 function generateSampleChartData() {
   return {
     data: {
-      title: '销售趋势图',
+      title: '销售趋势图11111',
       type: 'line-chart',
       dataSource: 'ERP系统',
       category: '销售分析',
@@ -558,7 +545,14 @@ function bindAsTextField() {
     type: 'text-field',
     fieldName: fieldName,
     dataType: 'text',
-    category: 'data-field'
+    category: 'data-field',
+    metadata: {
+        rid: 'field_' + Date.now(),
+        tag: '{name:' + fieldName + '}',
+        originalText: '',
+        insertedAt: new Date().toISOString(),
+        metricType: 'text'
+      }
   });
 }
 
