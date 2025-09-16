@@ -74,6 +74,19 @@
         </button>
       </div>
 
+      <!-- Chart Binding 按钮组 - 新增 -->
+      <div style="display:flex;gap:4px;border-left:1px solid #ddd;padding-left:8px;">
+        <button @click="bindChartData" style="background:#e65100;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
+          绑定图表数据
+        </button>
+        <button @click="getChartSummary" style="background:#ff6f00;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
+          图表摘要
+        </button>
+        <button @click="testChartDetection" style="background:#ff8f00;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
+          测试检测
+        </button>
+      </div>
+
       <span :style="{marginLeft:'auto', color: pluginReady ? '#28a745' : '#999'}">
         {{ pluginReady ? '插件已就绪' : '等待插件就绪…' }}
       </span>
@@ -193,7 +206,7 @@ async function createEditor() {
     },
     plugins: {
       autostart: [PLUGIN_GUID],
-      pluginsData: [{ url: PLUGIN_CONF + '?v=' + Date.now() }] // 强刷缓存
+      pluginsData: [{ url: PLUGIN_CONF + '?v=2.0.' + Date.now() }] // 强刷缓存
     },
     width: '100%',
     height: '100%',
@@ -264,6 +277,11 @@ async function createEditor() {
         if (e.data.command === 'preciseTableCellClicked') {
           console.log('[ONLYOFFICE] 精确表格单元格被点击:', e.data.data)
           handlePreciseTableCellClicked(e.data.data)
+        }
+        // 图表点击检测事件 - 新增
+        if (e.data.command === 'chartClicked') {
+          console.log('[ONLYOFFICE] 图表被点击:', e.data.data)
+          handleChartClicked(e.data.data)
         }
       }
     }
@@ -474,7 +492,59 @@ function generateBusinessData() {
   };
 }
 
-// ---- Selection Binding 选中内容绑定功能 ----
+// ---- Chart Binding 图表绑定功能 - 新增 ----
+
+// 绑定图表数据
+function bindChartData() {
+  const chartData = generateSampleChartData();
+  serviceCommandSafe('bindChartData', chartData);
+}
+
+// 获取图表绑定摘要
+function getChartSummary() {
+  serviceCommandSafe('getChartSummary', {});
+}
+
+// 测试图表检测
+function testChartDetection() {
+  serviceCommandSafe('chartClicked', {});
+}
+
+// 生成示例图表数据
+function generateSampleChartData() {
+  return {
+    data: {
+      title: '销售趋势图',
+      type: 'line-chart',
+      dataSource: 'ERP系统',
+      category: '销售分析',
+      period: '2024年第一季度',
+      metrics: {
+        totalSales: 1250000,
+        growthRate: 15.8,
+        topProduct: 'iPhone 15',
+        targetAchievement: 125
+      },
+      series: [
+        { name: '销售额', data: [120000, 135000, 128000, 142000] },
+        { name: '目标', data: [125000, 130000, 135000, 140000] }
+      ],
+      categories: ['1月', '2月', '3月', '4月']
+    },
+    metadata: {
+      bindingId: 'chart_' + Date.now(),
+      boundAt: new Date().toISOString(),
+      dataVersion: '1.0',
+      refreshInterval: 3600, // 秒
+      lastUpdated: new Date().toLocaleString('zh-CN'),
+      permissions: {
+        canEdit: true,
+        canRefresh: true,
+        canExport: true
+      }
+    }
+  };
+}
 
 // 分析选中内容
 function analyzeSelection() {
@@ -820,6 +890,118 @@ function handlePreciseTableCellClicked(data: any) {
     // 这通常是因为不是表格区域或检测方法失败，不需要alert
   }
 }
+// 处理图表点击事件 - 新增
+function handleChartClicked(data: any) {
+  console.log('📈 处理图表点击事件，收到数据:', data)
+
+  if (data && data.success && data.data) {
+    const chartInfo = data.data;
+
+    let info = `📈 图表点击检测结果！\n\n`;
+    info += `点击类型: ${chartInfo.clickType}\n`;
+    info += `检测时间: ${chartInfo.timestamp}\n\n`;
+
+    if (chartInfo.chartInfo) {
+      info += `📊 图表信息:\n`;
+      info += `- 图表索引: ${chartInfo.chartInfo.chartIndex}\n`;
+      info += `- 图表类型: ${chartInfo.chartInfo.chartType}\n`;
+
+      // 显示详细图表类型信息
+      if (chartInfo.chartInfo.detailedChartType) {
+        const detailed = chartInfo.chartInfo.detailedChartType;
+        info += `- 图表分类: ${detailed.category}\n`;
+        info += `- 具体类型: ${detailed.specificType}\n`;
+        info += `- 类型描述: ${detailed.description}\n`;
+        info += `- 识别置信度: ${(detailed.confidence * 100).toFixed(1)}%\n`;
+
+        if (detailed.properties && Object.keys(detailed.properties).length > 0) {
+          info += `- 属性信息: ${JSON.stringify(detailed.properties)}\n`;
+        }
+      }
+
+      info += `- 有绑定数据: ${chartInfo.chartInfo.hasBindingData ? '是' : '否'}\n`;
+      info += `- 绑定方法: ${chartInfo.chartInfo.bindingMethod || '无'}\n\n`;
+    }
+
+    if (chartInfo.boundData) {
+      info += `💾 绑定的数据:\n`;
+      if (chartInfo.boundData.title) {
+        info += `- 标题: ${chartInfo.boundData.title}\n`;
+      }
+      if (chartInfo.boundData.type) {
+        info += `- 类型: ${chartInfo.boundData.type}\n`;
+      }
+      if (chartInfo.boundData.dataSource) {
+        info += `- 数据源: ${chartInfo.boundData.dataSource}\n`;
+      }
+      if (chartInfo.boundData.period) {
+        info += `- 时间周期: ${chartInfo.boundData.period}\n`;
+      }
+
+      if (chartInfo.boundData.metrics) {
+        info += `\n📈 关键指标:\n`;
+        const metrics = chartInfo.boundData.metrics;
+        if (metrics.totalSales) {
+          info += `- 总销售额: ¥${metrics.totalSales.toLocaleString()}\n`;
+        }
+        if (metrics.growthRate) {
+          info += `- 增长率: ${metrics.growthRate}%\n`;
+        }
+        if (metrics.topProduct) {
+          info += `- 热门产品: ${metrics.topProduct}\n`;
+        }
+        if (metrics.targetAchievement) {
+          info += `- 目标达成: ${metrics.targetAchievement}%\n`;
+        }
+      }
+
+      if (chartInfo.boundData.series && chartInfo.boundData.series.length > 0) {
+        info += `\n📊 数据系列:\n`;
+        chartInfo.boundData.series.slice(0, 2).forEach((series: any) => {
+          info += `- ${series.name}: [${series.data.slice(0, 3).join(', ')}${series.data.length > 3 ? '...' : ''}]\n`;
+        });
+      }
+    }
+
+    if (chartInfo.bindingMetadata) {
+      info += `\n🔗 绑定信息:\n`;
+      info += `- 绑定ID: ${chartInfo.bindingMetadata.bindingId}\n`;
+      info += `- 绑定时间: ${chartInfo.bindingMetadata.boundAt}\n`;
+      info += `- 绑定方法: ${chartInfo.bindingMetadata.bindingMethod}\n`;
+    }
+
+    if (chartInfo.detectionSummary) {
+      info += `\n🔍 检测摘要:\n`;
+      info += `- 文档中图表总数: ${chartInfo.detectionSummary.totalChartsFound}\n`;
+      info += `- 有数据的图表: ${chartInfo.detectionSummary.chartsWithData}\n`;
+      info += `- 有选区: ${chartInfo.detectionSummary.hasSelection ? '是' : '否'}\n`;
+    }
+
+    alert(info);
+
+    // 可以根据图表数据执行相应的操作
+    console.log('📈 图表绑定数据:', chartInfo.boundData);
+
+    // 示例：根据图表类型执行不同操作
+    if (chartInfo.boundData) {
+      if (chartInfo.boundData.type === 'line-chart') {
+        console.log('📈 这是线图，可以显示趋势分析');
+      } else if (chartInfo.boundData.type === 'bar-chart') {
+        console.log('📊 这是柱状图，可以显示比较分析');
+      }
+
+      // 可以发送数据到外部系统进行处理
+      if (chartInfo.boundData.dataSource === 'ERP系统') {
+        console.log('🔄 可以触发ERP系统数据刷新');
+      }
+    }
+
+  } else if (data && data.success === false) {
+    console.log('❌ 图表检测失败或无图表:', data.error || '未知错误');
+    // 不显示错误alert，避免过多弹窗
+  }
+}
+
 function handleBindingClicked(data: any) {
   console.log('处理绑定控件点击事件，收到数据:', data)
 
