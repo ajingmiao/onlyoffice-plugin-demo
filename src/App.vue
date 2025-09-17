@@ -7,57 +7,6 @@
         插入链接
       </button>
 
-      <!-- WordArt 按钮组 -->
-      <div style="display:flex;gap:4px;border-left:1px solid #ddd;padding-left:8px;">
-        <button @click="insertCustomWordArt" style="background:#4caf50;color:#fff;border:none;padding:6px 12px;border-radius:4px;">
-          自定义WordArt
-        </button>
-        <button @click="insertClassicWordArt" style="background:#ff9800;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
-          经典
-        </button>
-        <button @click="insertModernWordArt" style="background:#673ab7;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
-          现代
-        </button>
-        <button @click="insertFunWordArt" style="background:#e91e63;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
-          趣味
-        </button>
-      </div>
-
-      <!-- Shape 测试按钮 -->
-      <div style="display:flex;gap:4px;border-left:1px solid #ddd;padding-left:8px;">
-        <button @click="testShapeInline" style="background:#795548;color:#fff;border:none;padding:6px 8px;border-radius:4px;font-size:12px;">
-          测试Shape
-        </button>
-        <button @click="insertRectangleInline" style="background:#607d8b;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
-          矩形
-        </button>
-        <button @click="insertCircleInline" style="background:#455a64;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
-          圆形
-        </button>
-        <button @click="insertTriangleInline" style="background:#37474f;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
-          三角形
-        </button>
-      </div>
-
-      <!-- Table 按钮组 -->
-      <div style="display:flex;gap:4px;border-left:1px solid #ddd;padding-left:8px;">
-        <button @click="insertSimpleTable" style="background:#8bc34a;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
-          简单表格
-        </button>
-        <button @click="insertScheduleTable" style="background:#4caf50;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
-          课程表
-        </button>
-        <button @click="insertComparisonTable" style="background:#66bb6a;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
-          对比表
-        </button>
-        <button @click="insertCustomTable" style="background:#388e3c;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
-          自定义
-        </button>
-        <button @click="insertDynamicTable" style="background:#2e7d32;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
-          动态数据
-        </button>
-      </div>
-
       <!-- Selection Binding 按钮组 -->
       <div style="display:flex;gap:4px;border-left:1px solid #ddd;padding-left:8px;">
         <button @click="analyzeSelection" style="background:#6a1b9a;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
@@ -106,7 +55,7 @@ const DOCUMENT_SERVER = 'http://localhost:9998'
 //const DOCUMENT_SERVER = 'http://222.187.11.98:8918'
 //const DOCUMENT_SERVER = 'http://localhost:9998'
 const DOCS_API = DOCUMENT_SERVER + '/web-apps/apps/api/documents/api.js'
-const FILE_URL = 'https://temp2-1302420147.cos.ap-nanjing.myqcloud.com/test.docx'
+const FILE_URL = 'https://badges-1302420147.cos.ap-shanghai.myqcloud.com/test1.docx'
 
 // 插件 GUID（需与插件 config.json 一致）  
 //9.0.4-9ade76efaf7465c8db6be392804370a8
@@ -193,9 +142,9 @@ async function createEditor() {
   const cfg = {
     document: {
       fileType: 'docx',
-      title: 'Demo.docx',
+      title: 'Demo2.docx',
       url: FILE_URL,
-      key: 'test-key',
+      key: 'test-key2',
       permissions: { edit: true }
     },
     documentType: 'word',
@@ -228,6 +177,9 @@ async function createEditor() {
            console.log('[ONLYOFFICE] openPlugin')
           // 这里再把消息转发给 DS 内部，让它真的打开 UI 面板
           editor.frame?.contentWindow?.Common?.Gateway?.sendInfo(msg);
+        }
+        if (e.data .command === 'activeSdt') {
+          console.log('[ONLYOFFICE] 插件确认收到:', e.data)
         }
         if (e.data.command === 'pluginInitialized') {
           pluginReady.value = true
