@@ -22,7 +22,7 @@ const DOCS_ORIGIN = new URL(DOCUMENT_SERVER).origin                 // 必须与
 const FILE_URL = 'https://temp2-1302420147.cos.ap-nanjing.myqcloud.com/test.docx'
 
 // 与插件一致（仅用于自动加载，不用于消息通道）
-const PLUGIN_GUID = 'asc.{6A1D2E30-1B7D-4A87-A2D7-4F3BB8A3C9E1}'
+const PLUGIN_GUID = 'asc.{6A1D2E30-1B7D-4A87-A2D7-4F3BB8A3C9E2}'
 // 一定要能在浏览器直接 200 打开（建议用带版本前缀的路径）
 const PLUGIN_CONF = 'http://localhost:9998/8.3.3-c7acbc51525f4e8ddd251a711f871b28/sdkjs-plugins/demo-a/config.json'
 

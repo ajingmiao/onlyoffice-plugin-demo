@@ -7,6 +7,44 @@
         插入链接
       </button>
 
+      <!-- WordArt 按钮组 -->
+      <div style="display:flex;gap:4px;border-left:1px solid #ddd;padding-left:8px;">
+        <button @click="insertCustomWordArt" style="background:#4caf50;color:#fff;border:none;padding:6px 12px;border-radius:4px;">
+          自定义WordArt
+        </button>
+        <button @click="insertClassicWordArt" style="background:#ff9800;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
+          经典
+        </button>
+        <button @click="insertModernWordArt" style="background:#673ab7;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
+          现代
+        </button>
+        <button @click="insertFunWordArt" style="background:#e91e63;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
+          趣味
+        </button>
+      </div>
+
+      <!-- Shape 测试按钮 -->
+     
+
+      <!-- Table 按钮组 -->
+      <div style="display:flex;gap:4px;border-left:1px solid #ddd;padding-left:8px;">
+        <button @click="insertSimpleTable" style="background:#8bc34a;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
+          简单表格
+        </button>
+        <button @click="insertScheduleTable" style="background:#4caf50;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
+          课程表
+        </button>
+        <button @click="insertComparisonTable" style="background:#66bb6a;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
+          对比表
+        </button>
+        <button @click="insertCustomTable" style="background:#388e3c;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
+          自定义
+        </button>
+        <button @click="insertDynamicTable" style="background:#2e7d32;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
+          动态数据
+        </button>
+      </div>
+
       <!-- Selection Binding 按钮组 -->
       <div style="display:flex;gap:4px;border-left:1px solid #ddd;padding-left:8px;">
         <button @click="analyzeSelection" style="background:#6a1b9a;color:#fff;border:none;padding:6px 8px;border-radius:4px;">
@@ -51,18 +89,18 @@ let editor: any = null
 const pluginReady = ref(false)
 
 // === 按你的环境修改 ===
-const DOCUMENT_SERVER = 'http://localhost:9998'
+const DOCUMENT_SERVER = 'http://192.168.1.103:9998'
 //const DOCUMENT_SERVER = 'http://222.187.11.98:8918'
 //const DOCUMENT_SERVER = 'http://localhost:9998'
 const DOCS_API = DOCUMENT_SERVER + '/web-apps/apps/api/documents/api.js'
 const FILE_URL = 'https://badges-1302420147.cos.ap-shanghai.myqcloud.com/test1.docx'
-
+// https://badges-1302420147.cos.ap-shanghai.myqcloud.com/test1.docx
 // 插件 GUID（需与插件 config.json 一致）  
 //9.0.4-9ade76efaf7465c8db6be392804370a8
 //http://222.187.11.98:8918/8.3.3-5dd8d105cac84554276dfe74dce59789/web-apps/apps/documenteditor/main/index.html?_dc=8.3.3-18&lang=zh-CN&customer=ONLYOFFICE&type=desktop&frameEditorId=editor&isForm=false&parentOrigin=http://localhost:5174&fileType=docx
 // http://192.168.1.103:9998/9.0.4-870a82e9bc8b96c4c53877e589326856/web-apps/apps/documenteditor/main/index.html?_dc=9.0.4-50&lang=zh-CN&customer=ONLYOFFICE&type=desktop&frameEditorId=editor&isForm=false&parentOrigin=http://localhost:5174&fileType=docx
 
-const PLUGIN_GUID = 'asc.{6A1D2E30-1B7D-4A87-A2D7-4F3BB8A3C9E1}'
+const PLUGIN_GUID = 'asc.{6A1D2E30-1B7D-4A87-A2D7-4F3BB8A3C9E2}'
 // 插件 config.json（必须可 200 直连）
 const PLUGIN_CONF = DOCUMENT_SERVER + '/9.0.4-870a82e9bc8b96c4c53877e589326856/sdkjs-plugins/demo-a/config.json'
 
@@ -142,9 +180,9 @@ async function createEditor() {
   const cfg = {
     document: {
       fileType: 'docx',
-      title: 'Demo2.docx',
+      title: 'Demo.docx',
       url: FILE_URL,
-      key: 'test-key2',
+      key: 'test-key',
       permissions: { edit: true }
     },
     documentType: 'word',
@@ -177,9 +215,6 @@ async function createEditor() {
            console.log('[ONLYOFFICE] openPlugin')
           // 这里再把消息转发给 DS 内部，让它真的打开 UI 面板
           editor.frame?.contentWindow?.Common?.Gateway?.sendInfo(msg);
-        }
-        if (e.data .command === 'activeSdt') {
-          console.log('[ONLYOFFICE] 插件确认收到:', e.data)
         }
         if (e.data.command === 'pluginInitialized') {
           pluginReady.value = true
@@ -466,7 +501,7 @@ function testChartDetection() {
 function generateSampleChartData() {
   return {
     data: {
-      title: '销售趋势图11111222',
+      title: '销售趋势图11111',
       type: 'line-chart',
       dataSource: 'ERP系统',
       category: '销售分析',
@@ -510,7 +545,14 @@ function bindAsTextField() {
     type: 'text-field',
     fieldName: fieldName,
     dataType: 'text',
-    category: 'data-field'
+    category: 'data-field',
+    metadata: {
+        rid: 'field_' + Date.now(),
+        tag: '{name:' + fieldName + '}',
+        originalText: '',
+        insertedAt: new Date().toISOString(),
+        metricType: 'text'
+      }
   });
 }
 
