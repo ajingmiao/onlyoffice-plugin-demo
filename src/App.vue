@@ -93,14 +93,14 @@ const DOCUMENT_SERVER = 'http://192.168.1.103:9998'
 //const DOCUMENT_SERVER = 'http://222.187.11.98:8918'
 //const DOCUMENT_SERVER = 'http://localhost:9998'
 const DOCS_API = DOCUMENT_SERVER + '/web-apps/apps/api/documents/api.js'
-const FILE_URL = 'https://temp2-1302420147.cos.ap-nanjing.myqcloud.com/test.docx'
-
+const FILE_URL = 'https://badges-1302420147.cos.ap-shanghai.myqcloud.com/test1.docx'
+// https://badges-1302420147.cos.ap-shanghai.myqcloud.com/test1.docx
 // 插件 GUID（需与插件 config.json 一致）  
 //9.0.4-9ade76efaf7465c8db6be392804370a8
 //http://222.187.11.98:8918/8.3.3-5dd8d105cac84554276dfe74dce59789/web-apps/apps/documenteditor/main/index.html?_dc=8.3.3-18&lang=zh-CN&customer=ONLYOFFICE&type=desktop&frameEditorId=editor&isForm=false&parentOrigin=http://localhost:5174&fileType=docx
 // http://192.168.1.103:9998/9.0.4-870a82e9bc8b96c4c53877e589326856/web-apps/apps/documenteditor/main/index.html?_dc=9.0.4-50&lang=zh-CN&customer=ONLYOFFICE&type=desktop&frameEditorId=editor&isForm=false&parentOrigin=http://localhost:5174&fileType=docx
 
-const PLUGIN_GUID = 'asc.{6A1D2E30-1B7D-4A87-A2D7-4F3BB8A3C9E1}'
+const PLUGIN_GUID = 'asc.{6A1D2E30-1B7D-4A87-A2D7-4F3BB8A3C9E2}'
 // 插件 config.json（必须可 200 直连）
 const PLUGIN_CONF = DOCUMENT_SERVER + '/9.0.4-870a82e9bc8b96c4c53877e589326856/sdkjs-plugins/demo-a/config.json'
 
